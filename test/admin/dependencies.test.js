@@ -12,6 +12,10 @@ const UPLOADED_DEPS = [
   { name: 'is-buffer', version: '2.0.4' }
 ];
 
+const sleep = (milliseconds) => {
+  return new Promise(resolve => setTimeout(resolve, milliseconds));
+};
+
 describe('Dependencies', () => {
   let test = new StitchMongoFixture();
   let th;
@@ -46,11 +50,14 @@ describe('Dependencies', () => {
       const response = await dependencies.upload(filePath, fileBody);
       expect(response.status).toBe(204);
 
-      let deps = await dependencies.list();
-      const sortedDependencies = deps.dependencies_list.sort((a, b) =>
-        a.name > b.name ? 1 : -1
-      );
-      expect(sortedDependencies).toEqual(UPLOADED_DEPS);
+      sleep(500).then(async() => {
+        let deps = await dependencies.list();
+
+        const sortedDependencies = deps.dependencies_list.sort((a, b) =>
+          a.name > b.name ? 1 : -1
+        );
+        expect(sortedDependencies).toEqual(UPLOADED_DEPS);
+      });
     });
   });
 });
